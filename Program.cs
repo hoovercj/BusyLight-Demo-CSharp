@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security.Permissions;
@@ -16,6 +17,8 @@ namespace BusyLightDemo
     {
         static int Main(string[] args)
         {
+            Console.Title = "BusyLight Demo";
+
             return Dialog.ShowDialog(Routine.BaseRoutines);
         }
     }
@@ -27,9 +30,16 @@ namespace BusyLightDemo
             string prompt = BuildOptionsPrompt(routines);
 
             string input = "";
+            bool error = false;
             while (true)
             {
+                Console.Clear();
                 Console.WriteLine(prompt);
+
+                if (error)
+                {
+                    Console.WriteLine("Invalid input, try again.");
+                }
 
                 input = Console.ReadLine();
 
@@ -46,11 +56,13 @@ namespace BusyLightDemo
                         return 1;
                     }
 
+                    Routine.LightOff.Invoke();
                     routines[selection - 1].Action.Invoke();
+                    error = false;
                 }
                 catch
                 {
-                    Console.WriteLine("Invalid input, try again.");
+                    error = true;
                 }
             }
         }
@@ -70,8 +82,10 @@ namespace BusyLightDemo
                     sb.AppendLine(string.Format("{0}. {1} - {2}", i + 1, routines[i].Name, routines[i].Description));
                 }
             }
-
             sb.AppendLine(string.Format("{0}. Exit", routines.Count + 1));
+
+            sb.AppendLine();
+            sb.AppendLine("Please type a number to select an option above: ");
 
             return sb.ToString();
         }
@@ -324,8 +338,8 @@ namespace BusyLightDemo
             new Routine(){ Name = "Open Office", Action = Routine.SoundClipOpenOffice },
             new Routine(){ Name = "Telephone Nordic", Action = Routine.SoundClipTelephoneNordic },
             new Routine(){ Name = "Telephone PickMeUp", Action = Routine.SoundClipTelephonePickMeUp },
-            new Routine(){ Name = "IM1", Action = Routine.SoundClipIM1 },
-            new Routine(){ Name = "IM2", Action = Routine.SoundClipIM2 },
+            new Routine(){ Name = "IM1", Description="Appears to only work as a jingle", Action = Routine.SoundClipIM1 },
+            new Routine(){ Name = "IM2", Description="Appears to only work as a jingle", Action = Routine.SoundClipIM2 },
             new Routine(){ Name = "Quiet", Action = Routine.SoundClipQuiet }
         };
 
